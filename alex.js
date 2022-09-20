@@ -14,7 +14,8 @@ function onHomeGetRequest(req, res) {
   if (req.query && req.query.user) {
     console.log(`user ${req.query.user} has landed`);
   }
-  res.sendFile(join(__dirname, "public", "index.html"));
+  console.log(nba_finals.csv);
+  res.sendFile(join(__dirname, "public", "nba_finals.csv"));
 }
 
 app.get("/", onHomeGetRequest);
