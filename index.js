@@ -32,7 +32,16 @@ function myMiddleware(req, res, next) {
 // write a function for if there is a user request parameter
 function UserMiddleWare(req, res, next) {
   const user = req.query.user;
+  if (!user) {
+    req.query.userPresent = false;
+    next();
+  }
+  req.query.userPresent = true;
+  next();
 }
+
+app.use(UserMiddleWare);
+
 app.get("/user", (req, res) => {
   console.log(req.query);
   return res.json({
@@ -41,7 +50,33 @@ app.get("/user", (req, res) => {
     age: req.query.age,
   });
 });
-app.use(UserMiddleWare);
+
+app.get("/user/:username", (req, res) => {
+  console.log(req.query);
+  console.log(req.params); // will contain whatevers in place of :username in the url
+  return res.json({
+    message: "hello world",
+    user: req.query.user,
+    age: req.query.age,
+  });
+});
+
+app.get("/profiles/:username", (req, res) => {
+  console.log(req.query);
+  console.log(req.params);
+  return res.json({
+    user: req.params.username,
+  });
+});
+app.get("/products/:slug", (req, res) => {
+  console.log(req.query);
+  console.log(req.params);
+  return res.json({
+    color: req.query.color,
+    size: req.query.size,
+  });
+});
+
 // now if we pass that function to app.use(),
 // it's going to pass *every single request*
 // through this function as they are coming in.
@@ -56,6 +91,7 @@ function onHomeGetRequest(req, res) {
   // MIDDLEWARE RUNS HERE, BECAUSE YOU TOLD IT TO WITH app.use(myMiddleware)
   // *** if you don't pass next(), we would hang here on request!!!***
 
+  console.log(`req.userPresent: ${req.userPresent}`);
   // query params: localhost:3333?user=joe   <----this last part
   // this is how the request can give us information sent by the user!
   if (req.query && req.query.user) {
@@ -70,9 +106,9 @@ function onHomeGetRequest(req, res) {
 // this is the moneyshot - everything express.js does is summed up in this line :D
 app.get("/", onHomeGetRequest);
 
-app.post("/about", (req, res) => {
-  app.send("Thanks for the answer");
-});
+// app.post("/about", (req, res) => {
+//   app.send("Thanks for the answer");
+// });
 
 // make something like this work -
 // you don't have to use cats. make an api that you're interested in!
